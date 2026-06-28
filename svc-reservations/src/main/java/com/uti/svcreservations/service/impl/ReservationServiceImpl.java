@@ -39,14 +39,14 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional
-    public ReservationResponse create(ReservationRequest request) {
+    public ReservationResponse createReservation(ReservationRequest request) {
         log.info("Creating reservation for guest={} roomId={}", request.getGuestEmail(), request.getRoomId());
 
         validateDates(request);
 
         if (reservationRepository.existsByGuestEmailAndRoomIdAndStatus(
                 request.getGuestEmail(), request.getRoomId(), ReservationStatus.ACTIVE)) {
-            throw new BusinessRuleException("Guest already has an active reservation for this room");
+            throw new BusinessRuleException("Duplicate active reservation: guest already has an active booking for this room");
         }
 
         AvailabilityClientResponse availability = roomsRestTemplateClient.checkAvailability(request.getRoomId());
@@ -73,7 +73,7 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public ReservationResponse findById(Long id) {
+    public ReservationResponse getReservationById(Long id) {
         log.info("Finding reservation by id={}", id);
         Reservation reservation = findReservationOrThrow(id);
         RoomClientResponse room = roomsRestTemplateClient.getRoomById(reservation.getRoomId());
@@ -85,7 +85,7 @@ public class ReservationServiceImpl implements ReservationService {
      */
     @Override
     @Transactional(readOnly = true)
-    public List<ReservationResponse> findByGuestEmail(String email) {
+    public List<ReservationResponse> getReservationsByEmail(String email) {
         log.info("Finding reservations for guest email={}", email);
         return reservationRepository.findByGuestEmail(email).stream()
                 .map(reservation -> {

@@ -1,12 +1,12 @@
 {
   "info": {
     "name": "Hotel Los Andes - Microservicios",
-    "description": "Coleccion de pruebas para svc-rooms y svc-reservations via Nginx Gateway (localhost:80)",
+    "description": "Coleccion alineada con Actividad 3 UTI. Base URL: http://localhost (Nginx puerto 80). Ejecutar pruebas en orden numerico.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "variable": [
     { "key": "baseUrl", "value": "http://localhost" },
-    { "key": "roomId", "value": "1" },
+    { "key": "roomId", "value": "2" },
     { "key": "reservationId", "value": "1" }
   ],
   "item": [
@@ -14,7 +14,7 @@
       "name": "svc-rooms",
       "item": [
         {
-          "name": "1. Registrar habitacion SINGLE",
+          "name": "Prueba 1 - Registrar SINGLE",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -22,11 +22,12 @@
               "mode": "raw",
               "raw": "{\n  \"roomNumber\": \"101\",\n  \"type\": \"SINGLE\",\n  \"pricePerNight\": 55.00,\n  \"totalCapacity\": 5,\n  \"availableRooms\": 5,\n  \"floor\": 1,\n  \"description\": \"Habitacion individual\"\n}"
             },
-            "url": "{{baseUrl}}/api/v1/rooms"
+            "url": "{{baseUrl}}/api/v1/rooms",
+            "description": "Esperado: 201 Created"
           }
         },
         {
-          "name": "2. Registrar habitacion DOUBLE",
+          "name": "Prueba 2 - Registrar DOUBLE",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -34,11 +35,12 @@
               "mode": "raw",
               "raw": "{\n  \"roomNumber\": \"201\",\n  \"type\": \"DOUBLE\",\n  \"pricePerNight\": 85.00,\n  \"totalCapacity\": 3,\n  \"availableRooms\": 3,\n  \"floor\": 2,\n  \"description\": \"Habitacion doble\"\n}"
             },
-            "url": "{{baseUrl}}/api/v1/rooms"
+            "url": "{{baseUrl}}/api/v1/rooms",
+            "description": "Esperado: 201 Created"
           }
         },
         {
-          "name": "3. Registrar habitacion SUITE",
+          "name": "Prueba 3 - Registrar SUITE",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -46,7 +48,8 @@
               "mode": "raw",
               "raw": "{\n  \"roomNumber\": \"301\",\n  \"type\": \"SUITE\",\n  \"pricePerNight\": 150.00,\n  \"totalCapacity\": 2,\n  \"availableRooms\": 2,\n  \"floor\": 3,\n  \"description\": \"Suite premium\"\n}"
             },
-            "url": "{{baseUrl}}/api/v1/rooms"
+            "url": "{{baseUrl}}/api/v1/rooms",
+            "description": "Esperado: 201 Created"
           }
         },
         {
@@ -69,6 +72,19 @@
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/rooms/{{roomId}}/availability"
           }
+        },
+        {
+          "name": "Prep Prueba 5 - Agotar disponibilidad room 1",
+          "request": {
+            "method": "PATCH",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"availableRooms\": 0\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/rooms/1/availability",
+            "description": "Ejecutar ANTES de Prueba 5. Pone availableRooms=0 en habitacion 1."
+          }
         }
       ]
     },
@@ -76,19 +92,20 @@
       "name": "svc-reservations",
       "item": [
         {
-          "name": "4. Crear reserva valida",
+          "name": "Prueba 4 - Crear reserva valida",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"roomId\": 1,\n  \"guestName\": \"Maria Torres\",\n  \"guestEmail\": \"maria.torres@email.com\",\n  \"checkInDate\": \"2026-07-01\",\n  \"checkOutDate\": \"2026-07-05\"\n}"
+              "raw": "{\n  \"roomId\": 2,\n  \"guestName\": \"Maria Torres\",\n  \"guestEmail\": \"maria.torres@email.com\",\n  \"checkInDate\": \"2026-07-01\",\n  \"checkOutDate\": \"2026-07-05\"\n}"
             },
-            "url": "{{baseUrl}}/api/v1/reservations"
+            "url": "{{baseUrl}}/api/v1/reservations",
+            "description": "Esperado: 201 Created con roomNumber, roomType, pricePerNight"
           }
         },
         {
-          "name": "5. Crear reserva sin disponibilidad",
+          "name": "Prueba 5 - Sin disponibilidad",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
@@ -96,26 +113,45 @@
               "mode": "raw",
               "raw": "{\n  \"roomId\": 1,\n  \"guestName\": \"Juan Perez\",\n  \"guestEmail\": \"juan.perez@email.com\",\n  \"checkInDate\": \"2026-08-01\",\n  \"checkOutDate\": \"2026-08-05\"\n}"
             },
-            "url": "{{baseUrl}}/api/v1/reservations"
+            "url": "{{baseUrl}}/api/v1/reservations",
+            "description": "Esperado: 422 - Room is not available"
           }
         },
         {
-          "name": "6. Reserva duplicada ACTIVE",
+          "name": "Prueba 6 - Reserva duplicada ACTIVE",
           "request": {
             "method": "POST",
             "header": [{ "key": "Content-Type", "value": "application/json" }],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"roomId\": 1,\n  \"guestName\": \"Maria Torres\",\n  \"guestEmail\": \"maria.torres@email.com\",\n  \"checkInDate\": \"2026-09-01\",\n  \"checkOutDate\": \"2026-09-03\"\n}"
+              "raw": "{\n  \"roomId\": 2,\n  \"guestName\": \"Maria Torres\",\n  \"guestEmail\": \"maria.torres@email.com\",\n  \"checkInDate\": \"2026-09-01\",\n  \"checkOutDate\": \"2026-09-03\"\n}"
             },
-            "url": "{{baseUrl}}/api/v1/reservations"
+            "url": "{{baseUrl}}/api/v1/reservations",
+            "description": "Esperado: 422 - Duplicate active reservation"
           }
         },
         {
-          "name": "7. Consultar reserva por ID",
+          "name": "Prueba 7 - Consultar reserva por ID",
           "request": {
             "method": "GET",
-            "url": "{{baseUrl}}/api/v1/reservations/{{reservationId}}"
+            "url": "{{baseUrl}}/api/v1/reservations/{{reservationId}}",
+            "description": "Esperado: 200 OK con datos completos del cuarto"
+          }
+        },
+        {
+          "name": "Prueba 8 - Checkout reserva ACTIVE",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/reservations/{{reservationId}}/checkout",
+            "description": "Esperado: 200 OK - status COMPLETED"
+          }
+        },
+        {
+          "name": "Prueba 9 - Checkout reserva COMPLETED",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/reservations/{{reservationId}}/checkout",
+            "description": "Esperado: 422 Unprocessable Entity"
           }
         },
         {
@@ -124,19 +160,39 @@
             "method": "GET",
             "url": "{{baseUrl}}/api/v1/reservations/guest/maria.torres@email.com"
           }
-        },
+        }
+      ]
+    },
+    {
+      "name": "Resilience4j",
+      "item": [
         {
-          "name": "8. Checkout reserva ACTIVE",
+          "name": "Prueba 10a - Crear reserva (svc-rooms caido)",
           "request": {
-            "method": "PATCH",
-            "url": "{{baseUrl}}/api/v1/reservations/{{reservationId}}/checkout"
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": 3,\n  \"guestName\": \"Carlos Ruiz\",\n  \"guestEmail\": \"carlos.ruiz@email.com\",\n  \"checkInDate\": \"2026-10-01\",\n  \"checkOutDate\": \"2026-10-05\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/reservations",
+            "description": "ANTES: docker stop svc-rooms. Esperado: 503 - Room information temporarily unavailable"
           }
         },
         {
-          "name": "9. Checkout reserva COMPLETED (error)",
+          "name": "Prueba 10b - Consultar reserva (svc-rooms caido)",
           "request": {
-            "method": "PATCH",
-            "url": "{{baseUrl}}/api/v1/reservations/{{reservationId}}/checkout"
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/reservations/{{reservationId}}",
+            "description": "Esperado: 200 OK - roomNumber: Room information temporarily unavailable"
+          }
+        },
+        {
+          "name": "Prueba 10c - Consultar reserva (recuperacion)",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/reservations/{{reservationId}}",
+            "description": "DESPUES: docker start svc-rooms y esperar 15s. Esperado: 200 OK con datos reales del cuarto"
           }
         }
       ]

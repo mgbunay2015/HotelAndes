@@ -32,7 +32,7 @@ public class ReservationController {
      */
     @PostMapping
     public ResponseEntity<ReservationResponse> create(@Valid @RequestBody ReservationRequest request) {
-        ReservationResponse created = reservationService.create(request);
+        ReservationResponse created = reservationService.createReservation(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
@@ -41,7 +41,7 @@ public class ReservationController {
      */
     @GetMapping("/{id}")
     public ResponseEntity<ReservationResponse> findById(@PathVariable Long id) {
-        return ResponseEntity.ok(reservationService.findById(id));
+        return ResponseEntity.ok(reservationService.getReservationById(id));
     }
 
     /**
@@ -49,7 +49,7 @@ public class ReservationController {
      */
     @GetMapping("/guest/{email}")
     public ResponseEntity<List<ReservationResponse>> findByGuestEmail(@PathVariable String email) {
-        return ResponseEntity.ok(reservationService.findByGuestEmail(email));
+        return ResponseEntity.ok(reservationService.getReservationsByEmail(email));
     }
 
     /**
