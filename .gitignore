@@ -7,3 +7,4 @@ target/
 *.log
 *.bat
 *.pdf
+docs/generate_manual.py
