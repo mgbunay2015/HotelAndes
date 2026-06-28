@@ -1,0 +1,97 @@
+services:
+
+  nginx-gateway:
+    image: nginx:alpine
+    container_name: nginx-gateway
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - svc-rooms
+      - svc-reservations
+    networks:
+      - hotel-net
+
+  svc-rooms:
+    build: ./svc-rooms
+    container_name: svc-rooms
+    ports:
+      - "8081:8081"
+    environment:
+      - DB_HOST=rooms-db
+      - DB_PORT=5432
+      - DB_NAME=rooms_db
+      - DB_USER=postgres
+      - DB_PASS=postgres
+    depends_on:
+      rooms-db:
+        condition: service_healthy
+    networks:
+      - hotel-net
+
+  svc-reservations:
+    build: ./svc-reservations
+    container_name: svc-reservations
+    ports:
+      - "8082:8082"
+    environment:
+      - DB_HOST=reservations-db
+      - DB_PORT=5432
+      - DB_NAME=reservations_db
+      - DB_USER=postgres
+      - DB_PASS=postgres
+      - ROOMS_SERVICE_URL=http://svc-rooms:8081
+    depends_on:
+      reservations-db:
+        condition: service_healthy
+      svc-rooms:
+        condition: service_started
+    networks:
+      - hotel-net
+
+  rooms-db:
+    image: postgres:16-alpine
+    container_name: rooms-db
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: rooms_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - rooms_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d rooms_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - hotel-net
+
+  reservations-db:
+    image: postgres:16-alpine
+    container_name: reservations-db
+    ports:
+      - "5434:5432"
+    environment:
+      POSTGRES_DB: reservations_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - reservations_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d reservations_db"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    networks:
+      - hotel-net
+
+networks:
+  hotel-net:
+    driver: bridge
+
+volumes:
+  rooms_data:
+  reservations_data:

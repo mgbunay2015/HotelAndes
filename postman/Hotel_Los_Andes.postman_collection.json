@@ -1,0 +1,145 @@
+{
+  "info": {
+    "name": "Hotel Los Andes - Microservicios",
+    "description": "Coleccion de pruebas para svc-rooms y svc-reservations via Nginx Gateway (localhost:80)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost" },
+    { "key": "roomId", "value": "1" },
+    { "key": "reservationId", "value": "1" }
+  ],
+  "item": [
+    {
+      "name": "svc-rooms",
+      "item": [
+        {
+          "name": "1. Registrar habitacion SINGLE",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomNumber\": \"101\",\n  \"type\": \"SINGLE\",\n  \"pricePerNight\": 55.00,\n  \"totalCapacity\": 5,\n  \"availableRooms\": 5,\n  \"floor\": 1,\n  \"description\": \"Habitacion individual\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/rooms"
+          }
+        },
+        {
+          "name": "2. Registrar habitacion DOUBLE",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomNumber\": \"201\",\n  \"type\": \"DOUBLE\",\n  \"pricePerNight\": 85.00,\n  \"totalCapacity\": 3,\n  \"availableRooms\": 3,\n  \"floor\": 2,\n  \"description\": \"Habitacion doble\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/rooms"
+          }
+        },
+        {
+          "name": "3. Registrar habitacion SUITE",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomNumber\": \"301\",\n  \"type\": \"SUITE\",\n  \"pricePerNight\": 150.00,\n  \"totalCapacity\": 2,\n  \"availableRooms\": 2,\n  \"floor\": 3,\n  \"description\": \"Suite premium\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/rooms"
+          }
+        },
+        {
+          "name": "Listar habitaciones",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/rooms"
+          }
+        },
+        {
+          "name": "Obtener habitacion por ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/rooms/{{roomId}}"
+          }
+        },
+        {
+          "name": "Consultar disponibilidad",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/rooms/{{roomId}}/availability"
+          }
+        }
+      ]
+    },
+    {
+      "name": "svc-reservations",
+      "item": [
+        {
+          "name": "4. Crear reserva valida",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": 1,\n  \"guestName\": \"Maria Torres\",\n  \"guestEmail\": \"maria.torres@email.com\",\n  \"checkInDate\": \"2026-07-01\",\n  \"checkOutDate\": \"2026-07-05\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/reservations"
+          }
+        },
+        {
+          "name": "5. Crear reserva sin disponibilidad",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": 1,\n  \"guestName\": \"Juan Perez\",\n  \"guestEmail\": \"juan.perez@email.com\",\n  \"checkInDate\": \"2026-08-01\",\n  \"checkOutDate\": \"2026-08-05\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/reservations"
+          }
+        },
+        {
+          "name": "6. Reserva duplicada ACTIVE",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"roomId\": 1,\n  \"guestName\": \"Maria Torres\",\n  \"guestEmail\": \"maria.torres@email.com\",\n  \"checkInDate\": \"2026-09-01\",\n  \"checkOutDate\": \"2026-09-03\"\n}"
+            },
+            "url": "{{baseUrl}}/api/v1/reservations"
+          }
+        },
+        {
+          "name": "7. Consultar reserva por ID",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/reservations/{{reservationId}}"
+          }
+        },
+        {
+          "name": "Consultar reservas por email",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/api/v1/reservations/guest/maria.torres@email.com"
+          }
+        },
+        {
+          "name": "8. Checkout reserva ACTIVE",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/reservations/{{reservationId}}/checkout"
+          }
+        },
+        {
+          "name": "9. Checkout reserva COMPLETED (error)",
+          "request": {
+            "method": "PATCH",
+            "url": "{{baseUrl}}/api/v1/reservations/{{reservationId}}/checkout"
+          }
+        }
+      ]
+    }
+  ]
+}
